@@ -1,0 +1,40 @@
+{
+	"schemaVersion": 1,
+	"id": "cryoclient",
+	"version": "${version}",
+	"name": "CryoClient",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/cryoclient/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"net.hockeyfan17.cryoclient.Main"
+		],
+		"fabric-datagen": [
+			"net.hockeyfan17.cryoclient.DataGenerator"
+		],
+		"client": [
+			"net.hockeyfan17.cryoclient.Client"
+		]
+	},
+	"mixins": [
+		"cryoclient.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.14",
+		"minecraft": "~1.21",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
