@@ -1,17 +1,17 @@
 {
 	"schemaVersion": 1,
 	"id": "cryoclient",
-	"version": "${version}",
+	"version": "0.0.1",
 	"name": "CryoClient",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Fabric Mod for Ice Boat Racing!",
 	"authors": [
-		"Me!"
+		"hockeyfan17!"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/hockeyfan1708/CryoClient-1.21"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/cryoclient/icon.png",
 	"environment": "*",
 	"entrypoints": {
@@ -30,7 +30,7 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.16.14",
-		"minecraft": "~1.21",
+		"minecraft": ">=1.21",
 		"java": ">=21",
 		"fabric-api": "*"
 	},
