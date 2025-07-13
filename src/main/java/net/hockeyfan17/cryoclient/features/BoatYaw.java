@@ -3,6 +3,8 @@ package net.hockeyfan17.cryoclient.features;
 import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.hockeyfan17.cryoclient.CryoConfig;
+import net.hockeyfan17.cryoclient.Main;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.text.Text;
@@ -14,41 +16,50 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
 public class BoatYaw {
 
     public static MinecraftClient client = MinecraftClient.getInstance();
-    public static boolean boatYawToggle = false;
 
     public static void BoatYawCommand(CommandDispatcher<FabricClientCommandSource> dispatcher) {
-        if (client == null) return;
+        if (client == null || client.player == null) return;
+
         List<String> CryoClient = List.of("cc", "CryoClient");
 
         for (String cc : CryoClient) {
             dispatcher.register(literal(cc)
-                    .then(literal("BoatYaw"))
+                    .then(literal("BoatYaw")
                             .executes(context -> {
-                                boatYawToggle = !boatYawToggle;
-                                Text message = Text.literal("Boat Yaw ")
-                                        .formatted(Formatting.GRAY)
-                                        .append(Text.literal(boatYawToggle ? "Started" : "Stopped").formatted(boatYawToggle ? Formatting.GREEN : Formatting.RED));
-                                assert client.player != null;
-                                client.player.sendMessage(message);
+                                CryoConfig.INSTANCE.boatYawToggle = !CryoConfig.INSTANCE.boatYawToggle;
+                                Text message = Main.CryoClientName.copy()
+                                        .append("Boat Yaw ").formatted(Formatting.GRAY)
+                                        .append(Text.literal(CryoConfig.INSTANCE.boatYawToggle ? "Enabled" : "Disabled")
+                                                .formatted(CryoConfig.INSTANCE.boatYawToggle ? Formatting.GREEN : Formatting.RED));
+                                    client.player.sendMessage(message);
                                 return 1;
-                            }));
+                            })
+                    )
+            );
         }
     }
 
     public static void RotationsNeededCommand(CommandDispatcher<FabricClientCommandSource> dispatcher) {
-        dispatcher.register(literal("cc")
-                .then(literal("RotationsNeeded"))
-                        .executes(context -> {
-                            totalRotationNeeded();
-                            return 1;
-                        }));
+
+        List<String> CryoClient = List.of("cc", "CryoClient");
+
+        for (String cc : CryoClient) {
+            dispatcher.register(literal(cc)
+                    .then(literal("RotationsNeeded")
+                            .executes(context -> {
+                                totalRotationNeeded();
+                                return 1;
+                            })
+                    )
+            );
+        }
     }
 
     public static void BoatYawHud() {
         HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
             MinecraftClient client = MinecraftClient.getInstance();
 
-            if (BoatYaw.boatYawToggle && client.player != null && client.player.getVehicle() instanceof BoatEntity boat) {
+            if (CryoConfig.INSTANCE.boatYawToggle && client.player != null && client.player.getVehicle() instanceof BoatEntity boat) {
                 double yaw = getBoatYaw(boat);
                 String displayText = String.format("%.4f", yaw);
                 int screenWidth = client.getWindow().getScaledWidth();
@@ -108,6 +119,8 @@ public class BoatYaw {
 
         totalRotation = bestSteps * step;
 
-        client.player.sendMessage(Text.literal(String.valueOf(bestAngle)).formatted(Formatting.GREEN));
+        Text message = Main.CryoClientName.copy()
+                        .append(String.valueOf(bestAngle)).formatted(Formatting.GREEN);
+        client.player.sendMessage(message);
     }
 }
