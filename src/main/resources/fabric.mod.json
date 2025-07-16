@@ -5,7 +5,10 @@
 	"name": "CryoClient",
 	"description": "Fabric Mod for Ice Boat Racing!",
 	"authors": [
-		"hockeyfan17!"
+		"hockeyfan17"
+	],
+	"contributors": [
+		"Xbee8607"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
@@ -29,7 +32,7 @@
 		"cryoclient.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.16.3",
+		"fabricloader": "*",
 		"minecraft": ">=1.21",
 		"java": ">=21",
 		"fabric-api": "*"
