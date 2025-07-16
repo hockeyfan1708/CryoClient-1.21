@@ -16,7 +16,8 @@ public class Main implements ModInitializer {
 				.append(Text.literal("[").formatted(Formatting.DARK_GRAY))
 				.append(Text.literal("Cryo").formatted(Formatting.AQUA))
 				.append(Text.literal("Client").formatted(Formatting.WHITE))
-				.append(Text.literal("] ").formatted(Formatting.DARK_GRAY));
+				.append(Text.literal("]").formatted(Formatting.DARK_GRAY))
+				.append(Text.literal(" "));
 	}
 
 	@Override

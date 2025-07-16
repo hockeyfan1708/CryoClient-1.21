@@ -16,6 +16,8 @@ public class CryoConfig {
     public static CryoConfig INSTANCE = new CryoConfig();
     public boolean boatYawToggle;
     public boolean hidePassengersToggle;
+    public boolean democracyChatToggle;
+    public boolean messageTypeToggle;
 
     public void load() {
         try {
@@ -23,6 +25,8 @@ public class CryoConfig {
                 CryoConfig loaded = GSON.fromJson(new FileReader(CONFIG_FILE), CryoConfig.class);
                 this.boatYawToggle = loaded.boatYawToggle;
                 this.hidePassengersToggle = loaded.hidePassengersToggle;
+                this.democracyChatToggle = loaded.democracyChatToggle;
+                this.messageTypeToggle = loaded.messageTypeToggle;
             } else {
                 save();
             }
@@ -31,10 +35,9 @@ public class CryoConfig {
         }
     }
 
-    // Save to file
     public void save() {
         try {
-            CONFIG_FILE.getParentFile().mkdirs(); // ensure dir exists
+            CONFIG_FILE.getParentFile().mkdirs();
             FileWriter writer = new FileWriter(CONFIG_FILE);
             GSON.toJson(this, writer);
             writer.close();
