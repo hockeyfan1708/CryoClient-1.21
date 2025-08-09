@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.hockeyfan17.cryoclient.features.BoatYaw;
 import net.hockeyfan17.cryoclient.features.DemocracyChat;
 import net.hockeyfan17.cryoclient.features.HidePassengers;
+import net.hockeyfan17.cryoclient.features.PitReminder;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -12,6 +13,9 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 public class Client implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
+
+        BoatYaw.BoatYawHud();
+        PitReminder.PitReminderHud();
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             CryoConfig.INSTANCE.load();
@@ -31,8 +35,6 @@ public class Client implements ClientModInitializer {
             BoatYaw.BoatYawCommand(dispatcher);
         });
 
-        BoatYaw.BoatYawHud();
-
         // RotationsNeeded Command //
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             BoatYaw.RotationsNeededCommand(dispatcher);
@@ -49,9 +51,15 @@ public class Client implements ClientModInitializer {
             DemocracyChat.DemocracyChatCommand(dispatcher);
         });
 
+        // Pit Reminder Command //
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+            PitReminder.PitReminderCommand(dispatcher);
+        });
+
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, sender) -> {
             String rawMessage = message.getString();
             DemocracyChat.democracyChatFunction(rawMessage);
+            if(CryoConfig.INSTANCE.pitReminderToggle) {PitReminder.pitReminderFunction(rawMessage);}
             return true;
         });
     }
