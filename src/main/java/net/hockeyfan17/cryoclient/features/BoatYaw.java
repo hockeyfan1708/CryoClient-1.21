@@ -1,7 +1,5 @@
 package net.hockeyfan17.cryoclient.features;
 
-import com.mojang.brigadier.CommandDispatcher;
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.hockeyfan17.cryoclient.CryoConfig;
 import net.hockeyfan17.cryoclient.Main;
@@ -9,51 +7,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import java.util.List;
-
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
 
 public class BoatYaw {
 
     public static MinecraftClient client = MinecraftClient.getInstance();
-
-    public static void BoatYawCommand(CommandDispatcher<FabricClientCommandSource> dispatcher) {
-        if (client == null || client.player == null) return;
-
-        List<String> CryoClient = List.of("cc", "CryoClient");
-
-        for (String cc : CryoClient) {
-            dispatcher.register(literal(cc)
-                    .then(literal("BoatYaw")
-                            .executes(context -> {
-                                CryoConfig.INSTANCE.boatYawToggle = !CryoConfig.INSTANCE.boatYawToggle;
-                                Text message = Main.CryoClientName.copy()
-                                        .append("Boat Yaw ").formatted(Formatting.GRAY)
-                                        .append(Text.literal(CryoConfig.INSTANCE.boatYawToggle ? "Enabled" : "Disabled")
-                                                .formatted(CryoConfig.INSTANCE.boatYawToggle ? Formatting.GREEN : Formatting.RED));
-                                    client.player.sendMessage(message);
-                                return 1;
-                            })
-                    )
-            );
-        }
-    }
-
-    public static void RotationsNeededCommand(CommandDispatcher<FabricClientCommandSource> dispatcher) {
-
-        List<String> CryoClient = List.of("cc", "CryoClient");
-
-        for (String cc : CryoClient) {
-            dispatcher.register(literal(cc)
-                    .then(literal("RotationsNeeded")
-                            .executes(context -> {
-                                totalRotationNeeded();
-                                return 1;
-                            })
-                    )
-            );
-        }
-    }
 
     public static void BoatYawHud() {
         HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
@@ -64,10 +21,10 @@ public class BoatYaw {
                 String displayText = String.format("%.4f", yaw);
                 int screenWidth = client.getWindow().getScaledWidth();
                 int screenHeight = client.getWindow().getScaledHeight();
-                int anchorX = (screenWidth / 2) + 20; // center of the screen
+                int anchorX = (screenWidth / 2) + 20;
                 int textWidth = client.textRenderer.getWidth(displayText);
-                float x = anchorX - textWidth; // centered horizontally
-                float y = screenHeight - 85; // 20px above hotbar (hotbar is ~20px tall)
+                float x = anchorX - textWidth;
+                float y = screenHeight - 85;
 
                 drawContext.drawTextWithShadow(
                         client.textRenderer,
@@ -90,11 +47,10 @@ public class BoatYaw {
 
     static double totalRotation;
 
-    public static void totalRotationNeeded() {
+    public static void totalRotationNeeded(double baseTarget) {
         var client = MinecraftClient.getInstance();
         if (client.player == null || client.world == null) return;
         double startAngle = boatAngle;
-        double baseTarget = 90.0;
         double step = 90.9091;
         int maxSteps = 50 * 360 / (int) step;
 
@@ -120,7 +76,10 @@ public class BoatYaw {
         totalRotation = bestSteps * step;
 
         Text message = Main.CryoClientName.copy()
-                        .append(String.valueOf(bestAngle)).formatted(Formatting.GREEN);
+                .append(Text.literal("Closest angle to ").formatted(Formatting.GRAY))
+                .append(Text.literal(String.valueOf(baseTarget)).formatted(Formatting.YELLOW))
+                .append(Text.literal(" is: ").formatted(Formatting.GRAY))
+                .append(Text.literal(String.valueOf(bestAngle)).formatted(Formatting.GREEN));
         client.player.sendMessage(message);
     }
 }

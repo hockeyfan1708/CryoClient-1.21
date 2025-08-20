@@ -1,19 +1,9 @@
 package net.hockeyfan17.cryoclient.features;
 
-import com.mojang.brigadier.CommandDispatcher;
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.hockeyfan17.cryoclient.CryoConfig;
-import net.hockeyfan17.cryoclient.Main;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-
-import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
-
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 import static org.joml.Math.floor;
 
 public class PitReminder {
@@ -26,30 +16,6 @@ public class PitReminder {
     private static long messageStartTime = -1;
     private static final long fadeDuration = 5000; // Milliseconds
 
-    public static void PitReminderCommand(CommandDispatcher<FabricClientCommandSource> dispatcher) {
-        assert client.player != null;
-        List<String> CryoClient = List.of("cc", "CryoClient");
-
-        for (String cc : CryoClient) {
-            dispatcher.register(literal(cc)
-                    .executes(context -> {
-                        client.player.sendMessage(Text.literal("Missing Args").formatted(Formatting.RED));
-                        return 1;
-                    })
-                    .then(literal("PitReminders")
-                            .executes(context -> {
-                                CryoConfig.INSTANCE.pitReminderToggle = !CryoConfig.INSTANCE.pitReminderToggle;
-                                Text message = Main.CryoClientName.copy()
-                                        .append(Text.literal("PitReminder ").formatted(Formatting.GRAY))
-                                        .append(Text.literal(CryoConfig.INSTANCE.pitReminderToggle ? "Enabled" : "Disabled")
-                                                .formatted(CryoConfig.INSTANCE.pitReminderToggle ? Formatting.GREEN : Formatting.RED));
-                                client.player.sendMessage(message);
-                                return 1;
-                            })
-                    )
-            );
-        }
-    }
     public static void pitReminderFunction(String rawMessage) {
         trackListCounting(rawMessage);
         raceJoinFunction(rawMessage);

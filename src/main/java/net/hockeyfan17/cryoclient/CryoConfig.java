@@ -19,6 +19,7 @@ public class CryoConfig {
     public boolean democracyChatToggle;
     public boolean messageTypeToggle;
     public boolean pitReminderToggle;
+    public boolean boatTrailToggle;
 
     public void load() {
         try {
@@ -29,6 +30,7 @@ public class CryoConfig {
                 this.democracyChatToggle = loaded.democracyChatToggle;
                 this.messageTypeToggle = loaded.messageTypeToggle;
                 this.pitReminderToggle = loaded.pitReminderToggle;
+                this.boatTrailToggle = loaded.boatTrailToggle;
             } else {
                 save();
             }

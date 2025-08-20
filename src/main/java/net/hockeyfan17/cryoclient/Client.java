@@ -2,9 +2,9 @@ package net.hockeyfan17.cryoclient;
 
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.hockeyfan17.cryoclient.features.BoatTrail;
 import net.hockeyfan17.cryoclient.features.BoatYaw;
 import net.hockeyfan17.cryoclient.features.DemocracyChat;
-import net.hockeyfan17.cryoclient.features.HidePassengers;
 import net.hockeyfan17.cryoclient.features.PitReminder;
 
 import net.fabricmc.api.ClientModInitializer;
@@ -14,6 +14,7 @@ public class Client implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
 
+        BoatTrail.init();
         BoatYaw.BoatYawHud();
         PitReminder.PitReminderHud();
 
@@ -30,31 +31,39 @@ public class Client implements ClientModInitializer {
         CryoConfig.INSTANCE.load();
         CryoTrackConfig.INSTANCE.load();
 
-        // BoatYaw Command //
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            BoatYaw.BoatYawCommand(dispatcher);
-        });
+        // Command Register //
+        ClientCommandRegistrationCallback.EVENT.register(Commands::registerCommands);
 
-        // RotationsNeeded Command //
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            BoatYaw.RotationsNeededCommand(dispatcher);
-        });
-
-        // Hide Passengers Command //
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            HidePassengers.HidePassengerCommand(dispatcher);
-        });
-
-
-        // Democracy Chat Command //
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            DemocracyChat.DemocracyChatCommand(dispatcher);
-        });
-
-        // Pit Reminder Command //
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            PitReminder.PitReminderCommand(dispatcher);
-        });
+//        // BoatTrail Command //
+//        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+//            BoatTrail.BoatTrailCommand(dispatcher);
+//        });
+//
+//        // BoatYaw Command //
+//        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+//            BoatYaw.BoatYawCommand(dispatcher);
+//        });
+//
+//        // RotationsNeeded Command //
+//        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+//            BoatYaw.RotationsNeededCommand(dispatcher);
+//        });
+//
+//        // Hide Passengers Command //
+//        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+//            HidePassengers.HidePassengerCommand(dispatcher);
+//        });
+//
+//
+//        // Democracy Chat Command //
+//        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+//            DemocracyChat.DemocracyChatCommand(dispatcher);
+//        });
+//
+//        // Pit Reminder Command //
+//        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+//            PitReminder.PitReminderCommand(dispatcher);
+//        });
 
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, sender) -> {
             String rawMessage = message.getString();
