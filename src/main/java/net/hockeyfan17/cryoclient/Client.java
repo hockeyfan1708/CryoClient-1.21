@@ -2,6 +2,8 @@ package net.hockeyfan17.cryoclient;
 
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer;
 import net.hockeyfan17.cryoclient.features.BoatTrail;
 import net.hockeyfan17.cryoclient.features.BoatYaw;
 import net.hockeyfan17.cryoclient.features.DemocracyChat;
@@ -9,14 +11,23 @@ import net.hockeyfan17.cryoclient.features.PitReminder;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.minecraft.util.Identifier;
 
 public class Client implements ClientModInitializer {
+    public static final Identifier BOAT_YAW_LAYER = Identifier.of("cryoclient", "boat_yaw");
+    public static final Identifier PIT_REMINDER_LAYER = Identifier.of("cryoclient", "pit_reminder");
+
     @Override
     public void onInitializeClient() {
 
         BoatTrail.init();
-        BoatYaw.BoatYawHud();
-        PitReminder.PitReminderHud();
+        HudLayerRegistrationCallback.EVENT.register(layeredDrawer -> {
+            // Attach your layer after the HUD's chat (or wherever it makes sense)
+            layeredDrawer.attachLayerBefore(IdentifiedLayer.CHAT, BOAT_YAW_LAYER, BoatYaw::BoatYawHud);
+        });
+        HudLayerRegistrationCallback.EVENT.register(layeredDrawer -> {
+            layeredDrawer.attachLayerBefore(IdentifiedLayer.CHAT, PIT_REMINDER_LAYER, PitReminder::PitReminderHud);
+        });
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             CryoConfig.INSTANCE.load();
@@ -33,37 +44,6 @@ public class Client implements ClientModInitializer {
 
         // Command Register //
         ClientCommandRegistrationCallback.EVENT.register(Commands::registerCommands);
-
-//        // BoatTrail Command //
-//        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-//            BoatTrail.BoatTrailCommand(dispatcher);
-//        });
-//
-//        // BoatYaw Command //
-//        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-//            BoatYaw.BoatYawCommand(dispatcher);
-//        });
-//
-//        // RotationsNeeded Command //
-//        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-//            BoatYaw.RotationsNeededCommand(dispatcher);
-//        });
-//
-//        // Hide Passengers Command //
-//        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-//            HidePassengers.HidePassengerCommand(dispatcher);
-//        });
-//
-//
-//        // Democracy Chat Command //
-//        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-//            DemocracyChat.DemocracyChatCommand(dispatcher);
-//        });
-//
-//        // Pit Reminder Command //
-//        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-//            PitReminder.PitReminderCommand(dispatcher);
-//        });
 
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, sender) -> {
             String rawMessage = message.getString();

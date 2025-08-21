@@ -2,6 +2,9 @@ package net.hockeyfan17.cryoclient.features;
 
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.RenderTickCounter;
+
 import java.util.HashMap;
 import java.util.Map;
 import static org.joml.Math.floor;
@@ -76,41 +79,39 @@ public class PitReminder {
     }
 
     // Setup Visuals for PitReminder
-    public static void PitReminderHud(){
-        HudRenderCallback.EVENT.register(( drawContext, tickDelta) -> {
-            MinecraftClient client = MinecraftClient.getInstance();
-            if (client == null || client.player == null) return;
+    public static void PitReminderHud(DrawContext context, RenderTickCounter tickCounter){
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client == null || client.player == null) return;
 
-            // Compute how long it's been
-            long elapsed = System.currentTimeMillis() - messageStartTime;
-            if (elapsed > fadeDuration) return; // Done fading
+        // Compute how long it's been
+        long elapsed = System.currentTimeMillis() - messageStartTime;
+        if (elapsed > fadeDuration) return; // Done fading
 
-            // Compute alpha from time (1.0 -> 0.0)
-            float alpha = 1.0f - (elapsed / (float) fadeDuration);
-            alpha = Math.max(0f, Math.min(1f, alpha)); // Clamp between 0 and 1
+        // Compute alpha from time (1.0 -> 0.0)
+        float alpha = 1.0f - (elapsed / (float) fadeDuration);
+        alpha = Math.max(0f, Math.min(1f, alpha)); // Clamp between 0 and 1
 
-            // Scale alpha into ARGB
-            int alphaInt = (int) (alpha * 255);
-            int color = (alphaInt << 24) | 0xFF0000; // 0xAARRGGBB
+        // Scale alpha into ARGB
+        int alphaInt = (int) (alpha * 255);
+        int color = (alphaInt << 24) | 0xFF0000; // 0xAARRGGBB
 
-            String displayText = "Pit Needed!";
-            int screenWidth = client.getWindow().getScaledWidth();
-            int screenHeight = client.getWindow().getScaledHeight();
-            float scale = 2.5f; // Scale of text
+        String displayText = "Pit Needed!";
+        int screenWidth = client.getWindow().getScaledWidth();
+        int screenHeight = client.getWindow().getScaledHeight();
+        float scale = 2.5f; // Scale of text
 
-            drawContext.getMatrices().push(); // Save the current state
+        context.getMatrices().push(); // Save the current state
 
-            // Scale from the top-left corner — shift to desired position first
-            drawContext.getMatrices().translate(screenWidth / 2f, screenHeight / 2f, 0);
-            drawContext.getMatrices().scale(scale, scale, 1.0f);
+        // Scale from the top-left corner — shift to desired position first
+        context.getMatrices().translate(screenWidth / 2f, screenHeight / 2f, 0);
+        context.getMatrices().scale(scale, scale, 1.0f);
 
-            int textWidth = client.textRenderer.getWidth(displayText);
-            int x = -textWidth / 2;
-            int y = -4; // roughly half the text height
+        int textWidth = client.textRenderer.getWidth(displayText);
+        int x = -textWidth / 2;
+        int y = -4; // roughly half the text height
 
-            drawContext.drawTextWithShadow(client.textRenderer, displayText, x, y, color);
-        });
-    }
+        context.drawTextWithShadow(client.textRenderer, displayText, x, y, color);
+    };
 
     private static boolean findIfPit(){
         int lapsRemaining = raceLaps - lapsCompleted;

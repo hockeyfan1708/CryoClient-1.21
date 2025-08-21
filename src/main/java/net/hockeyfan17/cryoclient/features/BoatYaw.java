@@ -4,37 +4,34 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.hockeyfan17.cryoclient.CryoConfig;
 import net.hockeyfan17.cryoclient.Main;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 public class BoatYaw {
+    public static void BoatYawHud(DrawContext context, RenderTickCounter tickCounter) {
+        MinecraftClient client = MinecraftClient.getInstance();
 
-    public static MinecraftClient client = MinecraftClient.getInstance();
+        if (CryoConfig.INSTANCE.boatYawToggle && client.player != null && client.player.getVehicle() instanceof BoatEntity boat) {
+            double yaw = getBoatYaw(boat);
+            String displayText = String.format("%.4f", yaw);
+            int screenWidth = client.getWindow().getScaledWidth();
+            int screenHeight = client.getWindow().getScaledHeight();
+            int anchorX = (screenWidth / 2) + 20;
+            int textWidth = client.textRenderer.getWidth(displayText);
+            float x = anchorX - textWidth;
+            float y = screenHeight - 85;
 
-    public static void BoatYawHud() {
-        HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
-            MinecraftClient client = MinecraftClient.getInstance();
-
-            if (CryoConfig.INSTANCE.boatYawToggle && client.player != null && client.player.getVehicle() instanceof BoatEntity boat) {
-                double yaw = getBoatYaw(boat);
-                String displayText = String.format("%.4f", yaw);
-                int screenWidth = client.getWindow().getScaledWidth();
-                int screenHeight = client.getWindow().getScaledHeight();
-                int anchorX = (screenWidth / 2) + 20;
-                int textWidth = client.textRenderer.getWidth(displayText);
-                float x = anchorX - textWidth;
-                float y = screenHeight - 85;
-
-                drawContext.drawTextWithShadow(
-                        client.textRenderer,
-                        displayText,
-                        (int) x,
-                        (int) y,
-                        0xFFAAAAAA
-                );
-            }
-        });
+            context.drawTextWithShadow(
+                    client.textRenderer,
+                    displayText,
+                    (int) x,
+                    (int) y,
+                    0xFFAAAAAA
+            );
+        }
     }
 
     static double boatAngle;
@@ -47,11 +44,12 @@ public class BoatYaw {
 
     static double totalRotation;
 
-    public static void totalRotationNeeded(double baseTarget) {
+    public static void totalRotationNeeded(double baseTarget, boolean surface) {
         var client = MinecraftClient.getInstance();
         if (client.player == null || client.world == null) return;
         double startAngle = boatAngle;
         double step = 90.9091;
+        if (!surface) step = 50.0000;
         int maxSteps = 50 * 360 / (int) step;
 
         double minDifference = Double.MAX_VALUE;
@@ -80,6 +78,6 @@ public class BoatYaw {
                 .append(Text.literal(String.valueOf(baseTarget)).formatted(Formatting.YELLOW))
                 .append(Text.literal(" is: ").formatted(Formatting.GRAY))
                 .append(Text.literal(String.valueOf(bestAngle)).formatted(Formatting.GREEN));
-        client.player.sendMessage(message);
+        client.player.sendMessage(message, false);
     }
 }

@@ -1,8 +1,10 @@
 package net.hockeyfan17.cryoclient;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.sun.jdi.connect.Connector;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
@@ -41,7 +43,7 @@ public class Commands {
                             .append(Text.literal("Hide Passengers ").formatted(Formatting.GRAY))
                             .append(Text.literal(CryoConfig.INSTANCE.hidePassengersToggle ? "Enabled" : "Disabled")
                                     .formatted(CryoConfig.INSTANCE.hidePassengersToggle ? Formatting.GREEN : Formatting.RED));
-                    client.player.sendMessage(message);
+                    client.player.sendMessage(message, false);
                     return 1;
                 });
 
@@ -53,21 +55,33 @@ public class Commands {
                             .append("Boat Yaw ").formatted(Formatting.GRAY)
                             .append(Text.literal(CryoConfig.INSTANCE.boatYawToggle ? "Enabled" : "Disabled")
                                     .formatted(CryoConfig.INSTANCE.boatYawToggle ? Formatting.GREEN : Formatting.RED));
-                    client.player.sendMessage(message);
+                    client.player.sendMessage(message, false);
                     return 1;
                 });
 
         // RotationsNeeded //
         var rotationsNeededCmd = ClientCommandManager.literal("RotationsNeeded")
                 .then(argument("angle", FloatArgumentType.floatArg())
+                        .then(literal("blue")
+                                .executes(context -> {
+                                    totalRotationNeeded(FloatArgumentType.getFloat(context, "angle"), true);
+                                    return 1;
+                                })
+                        )
+                        .then(literal("packed")
+                                .executes(context -> {
+                                    totalRotationNeeded(FloatArgumentType.getFloat(context, "angle"), false);
+                                    return 1;
+                                })
+                        )
                         .executes(context -> {
-                            totalRotationNeeded(FloatArgumentType.getFloat(context, "angle"));
+                            totalRotationNeeded(FloatArgumentType.getFloat(context, "angle"), true);
                             return 1;
                         })
 
                 )
                 .executes(context -> {
-                    totalRotationNeeded(90.0);
+                    totalRotationNeeded(90.0, true);
                     return 1;
                 });
 
@@ -80,7 +94,7 @@ public class Commands {
                                     .append(Text.literal("Democracy Messages ").formatted(Formatting.GRAY))
                                     .append(Text.literal(CryoConfig.INSTANCE.democracyChatToggle ? "Enabled" : "Disabled")
                                             .formatted(CryoConfig.INSTANCE.democracyChatToggle ? Formatting.GREEN : Formatting.RED));
-                            client.player.sendMessage(message);
+                            client.player.sendMessage(message, false);
                             return 1;
                         })
                 )
@@ -93,7 +107,7 @@ public class Commands {
                                             .setStyle(Style.EMPTY.withColor(0x54fbfc)
                                                     .withBold(true).withUnderline(true)
                                                     .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + alias + " DemocracyMessage ShowMessage"))));
-                            client.player.sendMessage(message);
+                            client.player.sendMessage(message, false);
                             return 1;
                         })
                 )
@@ -103,7 +117,7 @@ public class Commands {
                                     ? messageType2("(Track Name)")
                                     : messageType1();
                             client.player.sendMessage(Main.CryoClientName.copy()
-                                    .append(Text.literal(messageText)).formatted(Formatting.GRAY));
+                                    .append(Text.literal(messageText)).formatted(Formatting.GRAY), false);
                             return 1;
                         })
                 )
@@ -116,10 +130,10 @@ public class Commands {
                                                 CryoTrackConfig.INSTANCE.trackList.add(trackName);
                                                 CryoTrackConfig.INSTANCE.save();
                                                 client.player.sendMessage(Main.CryoClientName.copy()
-                                                        .append(Text.literal(trackName + " added!!")).formatted(Formatting.GRAY));
+                                                        .append(Text.literal(trackName + " added!!")).formatted(Formatting.GRAY), false);
                                             } else {
                                                 client.player.sendMessage(Main.CryoClientName.copy()
-                                                        .append(Text.literal(trackName + " already exists!")).formatted(Formatting.GRAY));
+                                                        .append(Text.literal(trackName + " already exists!")).formatted(Formatting.GRAY), false);
                                             }
                                             return 1;
                                         })
@@ -137,7 +151,7 @@ public class Commands {
                                                     iterator.remove();
                                                     CryoTrackConfig.INSTANCE.save();
                                                     client.player.sendMessage(Main.CryoClientName.copy()
-                                                            .append(Text.literal(trackName + " has been removed!")).formatted(Formatting.GRAY));
+                                                            .append(Text.literal(trackName + " has been removed!")).formatted(Formatting.GRAY), false);
                                                     removed = true;
                                                     break;
                                                 }
@@ -145,7 +159,7 @@ public class Commands {
 
                                             if(!removed){
                                                 client.player.sendMessage(Main.CryoClientName.copy()
-                                                        .append(Text.literal(trackName + " not found")).formatted(Formatting.GRAY));
+                                                        .append(Text.literal(trackName + " not found")).formatted(Formatting.GRAY), false);
                                             }
                                             return 1;
                                         })
@@ -155,7 +169,7 @@ public class Commands {
                                 .executes(context -> {
                                     if(CryoTrackConfig.INSTANCE.trackList.isEmpty()){
                                         client.player.sendMessage(Main.CryoClientName.copy()
-                                                .append(Text.literal("Track list is empty.").formatted(Formatting.GRAY)));
+                                                .append(Text.literal("Track list is empty.").formatted(Formatting.GRAY)), false);
                                     }else{
                                         Text message = Main.CryoClientName.copy()
                                                 .append(Text.literal("Current Tracks:").formatted(Formatting.AQUA));
@@ -163,7 +177,7 @@ public class Commands {
                                             message = message.copy().append(Text.literal("\n- " + track).formatted(Formatting.GRAY));
                                         }
                                         message = message.copy().append(Text.literal("\n"));
-                                        client.player.sendMessage(message);
+                                        client.player.sendMessage(message, false);
                                     }
                                     return 1;
                                 })
@@ -175,7 +189,7 @@ public class Commands {
                             .append(Text.literal("Democracy Messages ").formatted(Formatting.GRAY))
                             .append(Text.literal(CryoConfig.INSTANCE.democracyChatToggle ? "Enabled" : "Disabled")
                                     .formatted(CryoConfig.INSTANCE.democracyChatToggle ? Formatting.GREEN : Formatting.RED));
-                    client.player.sendMessage(message);
+                    client.player.sendMessage(message, false);
                     return 1;
                 });
 
@@ -187,7 +201,7 @@ public class Commands {
                             .append("Boat Trail ").formatted(Formatting.GRAY)
                             .append(Text.literal(CryoConfig.INSTANCE.boatTrailToggle ? "Enabled" : "Disabled")
                                     .formatted(CryoConfig.INSTANCE.boatTrailToggle ? Formatting.GREEN : Formatting.RED));
-                    client.player.sendMessage(message);
+                    client.player.sendMessage(message, false);
                     return 1;
                 });
 
@@ -199,7 +213,7 @@ public class Commands {
                             .append(Text.literal("PitReminder ").formatted(Formatting.GRAY))
                             .append(Text.literal(CryoConfig.INSTANCE.pitReminderToggle ? "Enabled" : "Disabled")
                                     .formatted(CryoConfig.INSTANCE.pitReminderToggle ? Formatting.GREEN : Formatting.RED));
-                    client.player.sendMessage(message);
+                    client.player.sendMessage(message, false);
                     return 1;
                 });
 
