@@ -22,7 +22,6 @@ public class Client implements ClientModInitializer {
 
         BoatTrail.init();
         HudLayerRegistrationCallback.EVENT.register(layeredDrawer -> {
-            // Attach your layer after the HUD's chat (or wherever it makes sense)
             layeredDrawer.attachLayerBefore(IdentifiedLayer.CHAT, BOAT_YAW_LAYER, BoatYaw::BoatYawHud);
         });
         HudLayerRegistrationCallback.EVENT.register(layeredDrawer -> {

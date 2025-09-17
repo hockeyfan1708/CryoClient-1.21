@@ -19,6 +19,11 @@ public class Main implements ModInitializer {
 				.append(Text.literal("]").formatted(Formatting.DARK_GRAY))
 				.append(Text.literal(" "));
 	}
+	public static final Text CryoCommand;
+	static {
+		CryoCommand = Text.literal("Cryo").formatted(Formatting.AQUA).copy()
+				.append(Text.literal("Client").formatted(Formatting.WHITE));
+	}
 
 	@Override
 	public void onInitialize() {

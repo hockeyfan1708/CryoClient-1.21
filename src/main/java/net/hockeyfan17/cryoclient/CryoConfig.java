@@ -9,6 +9,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class CryoConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -20,6 +23,21 @@ public class CryoConfig {
     public boolean messageTypeToggle;
     public boolean pitReminderToggle;
     public boolean boatTrailToggle;
+    public boolean trailUnderGlow;
+    public long trailDuration = 30000L;
+    public Float renderDistance = 100F;
+    public int trailWidth = 3;
+    public String[] quickRaceTrackList = {
+            "28g", "CyberWorld2", "NorthernWaterTribe", "Mementos",
+            "Australia2024", "Bahrain2024", "Australia2023", "Miami2024",
+            "Boingburg", "Monza2023", "Canada2024", "Imola2024",
+            "CircuitoftheAmericas", "BCC24", "BCC25", "EebreeManor", "4thLayerGFR",
+            "FuegoValley", "Brannheim", "BrimstoneSpeedway", "Triton", "IceColdSigma",
+            "MallardPark", "LasVegas", "SpaFrancorchamps2023", "Qatar2023", "MexicoFC1",
+            "RedBullRing3D", "Anatidaephobia", "Weherua", "DireWood", "Canada2023", "ContinentalIsland"
+    };
+
+//    public Map<UUID, float[]> playerColors = new HashMap<>();
 
     public void load() {
         try {
@@ -31,6 +49,12 @@ public class CryoConfig {
                 this.messageTypeToggle = loaded.messageTypeToggle;
                 this.pitReminderToggle = loaded.pitReminderToggle;
                 this.boatTrailToggle = loaded.boatTrailToggle;
+                this.trailDuration = loaded.trailDuration;
+                this.renderDistance = loaded.renderDistance;
+                this.trailUnderGlow = loaded.trailUnderGlow;
+                this.quickRaceTrackList = loaded.quickRaceTrackList;
+                this.trailWidth = loaded.trailWidth;
+//                this.playerColors = loaded.playerColors;
             } else {
                 save();
             }

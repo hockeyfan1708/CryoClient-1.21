@@ -1,12 +1,13 @@
 package net.hockeyfan17.cryoclient;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.sun.jdi.connect.Connector;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.hockeyfan17.cryoclient.features.QuickRace;
+import net.hockeyfan17.cryoclient.util.HelpCommand;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.text.ClickEvent;
@@ -34,6 +35,20 @@ public class Commands {
         var alias = ClientCommandManager.literal("cc");
 
         // === Subcommands === //
+
+        var helpCmd = ClientCommandManager.literal("Help")
+                .then(literal("HidePassengers")
+                        .executes(context -> {
+                            Text message = HelpCommand.HidePassengers().copy();
+                            client.player.sendMessage(message, false);
+                            return 1;
+                        })
+                )
+                .executes(context -> {
+                    Text message = HelpCommand.FullHelp();
+                    client.player.sendMessage(message, false);
+                    return 1;
+                });
 
         // HidePassengers //
         var hidePassengersCmd = ClientCommandManager.literal("HidePassengers")
@@ -195,6 +210,62 @@ public class Commands {
 
         // BoatTrail //
         var boatTrailCmd = ClientCommandManager.literal("BoatTrail")
+                .then(literal("SetDuration")
+                        .then(argument("Ticks", FloatArgumentType.floatArg())
+                                .executes(context -> {
+                                    CryoConfig.INSTANCE.trailDuration = (long) FloatArgumentType.getFloat(context, "Ticks");
+                                    Text message = Main.CryoClientName.copy()
+                                            .append("Boat Trail Duration Set To: ").formatted(Formatting.GRAY)
+                                            .append(Text.literal(String.valueOf(CryoConfig.INSTANCE.trailDuration))
+                                                    .formatted(Formatting.YELLOW));
+                                    client.player.sendMessage(message, false);
+                                    return 1;
+                                })
+                        )
+                        .executes(context -> {
+                            Text message = Main.CryoClientName.copy()
+                                    .append("Boat Trail Duration Is Currently Set To: ").formatted(Formatting.GRAY)
+                                    .append(Text.literal(String.valueOf(CryoConfig.INSTANCE.trailDuration))
+                                            .formatted(Formatting.YELLOW));
+                            client.player.sendMessage(message, false);
+                            return 1;
+                        })
+                )
+                .then(literal("SetRenderDistance")
+                        .then(argument("Blocks", FloatArgumentType.floatArg())
+                                .executes(context -> {
+                                    CryoConfig.INSTANCE.renderDistance = FloatArgumentType.getFloat(context, "Blocks");
+                                    Text message = Main.CryoClientName.copy()
+                                            .append("Boat Trail Render Distance Set To: ").formatted(Formatting.GRAY)
+                                            .append(Text.literal(String.valueOf(CryoConfig.INSTANCE.renderDistance))
+                                                    .formatted(Formatting.YELLOW));
+                                    client.player.sendMessage(message, false);
+                                    return 1;
+                                })
+                        )
+                        .executes(context -> {
+                            Text message = Main.CryoClientName.copy()
+                                    .append("Boat Trail Render Distance Is Currently Set To: ").formatted(Formatting.GRAY)
+                                    .append(Text.literal(String.valueOf(CryoConfig.INSTANCE.renderDistance))
+                                            .formatted(Formatting.YELLOW));
+                            client.player.sendMessage(message, false);
+                            return 1;
+                        })
+                )
+                .then(literal("ToggleUnderGlow")
+                        .executes(context -> {
+                            CryoConfig.INSTANCE.trailUnderGlow = !CryoConfig.INSTANCE.trailUnderGlow;
+                            Text message = Main.CryoClientName.copy()
+                                    .append("Boat Trail Under Glow ").formatted(Formatting.GRAY)
+                                    .append(Text.literal(CryoConfig.INSTANCE.trailUnderGlow ? "Enabled" : "Disabled")
+                                            .formatted(CryoConfig.INSTANCE.trailUnderGlow ? Formatting.GREEN : Formatting.RED));
+                            client.player.sendMessage(message, false);
+                            if (CryoConfig.INSTANCE.trailUnderGlow) {
+                                client.player.sendMessage(Text.literal("    EPILEPSY WARNING").setStyle(Style.EMPTY.withBold(true).withUnderline(true)).formatted(Formatting.RED), false);
+                            }
+                            return 1;
+                        })
+                )
                 .executes(context -> {
                     CryoConfig.INSTANCE.boatTrailToggle = !CryoConfig.INSTANCE.boatTrailToggle;
                     Text message = Main.CryoClientName.copy()
@@ -217,12 +288,41 @@ public class Commands {
                     return 1;
                 });
 
+        // QuickRace //
+        var quickRaceCmd = ClientCommandManager.literal("QuickRace")
+                .then(argument("Laps", IntegerArgumentType.integer())
+                        .then(argument("Pits", IntegerArgumentType.integer())
+                                .executes(context -> {
+                                    QuickRace.VoteTrack(IntegerArgumentType.getInteger(context, "Laps"), IntegerArgumentType.getInteger(context, "Pits"));
+                                    return 1;
+                                })
+                        )
+                );
+
+        // Config //
+        var configCmd = ClientCommandManager.literal("Config")
+                        .then(literal("Load")
+                                .executes(context -> {
+                                  CryoConfig.INSTANCE.load();
+                                  return 1;
+                                })
+                        )
+                        .then(literal("Save")
+                                .executes(context -> {
+                                    CryoConfig.INSTANCE.save();
+                                    return 1;
+                                })
+                        );
+
+        root.then(helpCmd);
         root.then(hidePassengersCmd);
         root.then(boatYawCmd);
         root.then(rotationsNeededCmd);
         root.then(democracyChatCmd);
         root.then(boatTrailCmd);
         root.then(pitReminderCmd);
+        root.then(quickRaceCmd);
+        root.then(configCmd);
 
         dispatcher.register(root);
         dispatcher.register(alias.redirect(root.build()));

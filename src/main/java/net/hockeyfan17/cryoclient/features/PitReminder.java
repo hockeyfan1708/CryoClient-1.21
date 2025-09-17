@@ -34,6 +34,10 @@ public class PitReminder {
             String[] Array1 = Array[1].split("\\(", 2);
             String trackName = Array1[0].replaceAll("\\s+", "").toLowerCase();
             int[] finalTrackData = trackStats.get(trackName);
+            if (finalTrackData == null) {
+                System.out.println("No track data found for: " + trackName);
+                return; // or handle default case
+            }
             raceLaps = (int) floor((float) finalTrackData[0] / finalTrackData[2]); // Starting lap not counted
             racePits = (int) floor((float) finalTrackData[1] / finalTrackData[2]);
             lapsCompleted = 0;
@@ -119,10 +123,6 @@ public class PitReminder {
         if(pitsRemaining == 0){
             return false;
         }
-        if(lapsRemaining - 1 == pitsRemaining){
-            return true;
-        } else{
-            return false;
-        }
+        return lapsRemaining - 1 == pitsRemaining;
     }
 }
