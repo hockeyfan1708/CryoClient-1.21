@@ -32,11 +32,11 @@ public class HelpCommand {
 
 
                 .append(yellowText(Name + " SetDuration", "Changes how long the BoatTrails last"))
-                .append(clickCommandInt("BoatTrail SetDuration ", String.valueOf(CryoConfig.INSTANCE.trailDuration)))
+                .append(clickCommandInt(Name + " SetDuration ", String.valueOf(CryoConfig.INSTANCE.trailDuration)))
 
 
                 .append(yellowText(Name + " SetRenderDistance", "Changes how far away the BoatTrails will render"))
-                .append(clickCommandInt("BoatTrail SetRenderDistance ", String.valueOf(CryoConfig.INSTANCE.renderDistance)));
+                .append(clickCommandInt(Name + " SetRenderDistance ", String.valueOf(CryoConfig.INSTANCE.renderDistance)));
     }
 
     public static Text QuickRace() {
@@ -47,8 +47,32 @@ public class HelpCommand {
                 .append(clickCommandInt(Name + " ", "Pits"));
     }
 
+    public static Text PigStopOverlay() {
+        String Name = "PigStopDisplay";
+
+        return yellowText(Name, "Toggles the " + Name + " feature\nGives Pigstops a custom GUI").copy()
+                .append(clickCommandToggle(Name, CryoConfig.INSTANCE.pigStopDisplayToggle))
+
+
+                .append(yellowText(Name + " Color", "Changes the Color of the items in the PigStop menu"))
+                .append(clickCommandInt(Name + " Color ", String.format("%08X", CryoConfig.INSTANCE.pigStopDisplayColor)))
+
+
+                .append(yellowText(Name + " Size", "Changes the Size of the PigStop menu"))
+                .append(clickCommandInt(Name + " Size ", String.valueOf(CryoConfig.INSTANCE.pigStopDisplaySize)))
+
+
+                .append(yellowText(Name + " HideChat", "Hides Chat when in the PigStop menu"))
+                .append(clickCommandToggle(Name + " HideChat ", CryoConfig.INSTANCE.pigStopDisplayHideChatToggle))
+
+
+                .append(yellowText(Name + " HighlightedSquare", "Shows what slot the mouse is currently hovering over in the PigStop menu"))
+                .append(clickCommandToggle(Name + " HighlightedSquare", CryoConfig.INSTANCE.pigStopDisplayHighlightSquareToggle));
+    }
+
     public static Text FullHelp() {
         return Help().copy()
+                .append(PigStopOverlay())
                 .append(HidePassengers())
                 .append(BoatTrail())
                 .append(QuickRace());
