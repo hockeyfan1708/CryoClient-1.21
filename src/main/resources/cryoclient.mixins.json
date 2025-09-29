@@ -5,7 +5,9 @@
 	"mixins": [
 		"ExampleMixin",
 		"PlayerEntityRendererHideMixin",
-		"PlayerEntityRendererCaptureMixin"
+		"PlayerEntityRendererCaptureMixin",
+		"HandledScreenMixin",
+		"HandledScreenAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -4,23 +4,32 @@ import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer;
-import net.hockeyfan17.cryoclient.features.BoatTrail;
-import net.hockeyfan17.cryoclient.features.BoatYaw;
-import net.hockeyfan17.cryoclient.features.DemocracyChat;
-import net.hockeyfan17.cryoclient.features.PitReminder;
+import net.hockeyfan17.cryoclient.features.*;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.util.Identifier;
 
 public class Client implements ClientModInitializer {
+    public static final Identifier TRACK_DETECTOR_LAYER = Identifier.of("cryoclient", "boat_reset");
     public static final Identifier BOAT_YAW_LAYER = Identifier.of("cryoclient", "boat_yaw");
     public static final Identifier PIT_REMINDER_LAYER = Identifier.of("cryoclient", "pit_reminder");
 
     @Override
     public void onInitializeClient() {
 
-        BoatTrail.init();
+//        IcePressurePlate.register();
+
+        BoatPriorityDisplay.register();
+
+        PigStopOverlay.register();
+
+//        TrackDetector.register();
+//        HudLayerRegistrationCallback.EVENT.register(layeredDrawer -> {
+//            layeredDrawer.attachLayerBefore(IdentifiedLayer.CHAT, TRACK_DETECTOR_LAYER, TrackDetector::TimeTrailStartHUD);
+//        });
+
+        BoatTrail.register();
         HudLayerRegistrationCallback.EVENT.register(layeredDrawer -> {
             layeredDrawer.attachLayerBefore(IdentifiedLayer.CHAT, BOAT_YAW_LAYER, BoatYaw::BoatYawHud);
         });

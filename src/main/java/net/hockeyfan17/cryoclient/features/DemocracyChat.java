@@ -29,7 +29,7 @@ public class DemocracyChat {
             String[] Array1 = Array[1].split("\\(", 2);
             String trackName = Array1[0].replaceAll("\\s+", "").toLowerCase();
 
-            for(String track : CryoTrackConfig.INSTANCE.trackList) {
+            for(String track : CryoConfig.INSTANCE.trackList) {
                 if(Objects.equals(track, trackName)) {
                     if(CryoConfig.INSTANCE.messageTypeToggle){
                         Objects.requireNonNull(client.getNetworkHandler()).sendChatMessage(messageType2(Array1[0]));

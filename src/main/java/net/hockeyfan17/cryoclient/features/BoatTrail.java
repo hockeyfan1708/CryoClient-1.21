@@ -27,9 +27,9 @@ public class BoatTrail {
     private record TrailPoint(Vec3d pos, long time) {}
     private static final long MAX_GAP_MS = 100;
 
-    public static void init() {
+    public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if ((!CryoConfig.INSTANCE.boatTrailToggle && !CryoConfig.INSTANCE.trailUnderGlow) || client.world == null) return;
+            if ((!CryoConfig.INSTANCE.boatTrailToggle && !CryoConfig.INSTANCE.boatTrailUnderGlowToggle) || client.world == null) return;
 
             long now = System.currentTimeMillis();
 
@@ -48,7 +48,7 @@ public class BoatTrail {
         });
 
         WorldRenderEvents.AFTER_TRANSLUCENT.register(context -> {
-            if (client.player == null || (!CryoConfig.INSTANCE.boatTrailToggle && !CryoConfig.INSTANCE.trailUnderGlow) || boatTrails.isEmpty()) return;
+            if (client.player == null || (!CryoConfig.INSTANCE.boatTrailToggle && !CryoConfig.INSTANCE.boatTrailUnderGlowToggle) || boatTrails.isEmpty()) return;
 
             MatrixStack matrices = context.matrixStack();
             Vec3d cameraPos = context.camera().getPos();
@@ -176,7 +176,7 @@ public class BoatTrail {
                         prevVerticalTop = verticalFrontTop;
                     }
 
-                    if (CryoConfig.INSTANCE.trailUnderGlow) {
+                    if (CryoConfig.INSTANCE.boatTrailUnderGlowToggle) {
                         float carpetHalfWidth = 0.7f;
                         float carpetYOffset = yOffset - 0.01f;
                         Vec3d carpetPerp = new Vec3d(-dir.z, 0, dir.x).normalize().multiply(carpetHalfWidth);
